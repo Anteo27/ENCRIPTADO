@@ -1,5 +1,6 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+import os
 
 def encrypt_file(input_file, output_file, key):
     # Tamaño del bloque AES en bytes (128 bits)
@@ -58,16 +59,28 @@ def decrypt_file(input_file, output_file, key):
     # Finaliza el descifrado (puede haber datos adicionales en el buffer del descifrador)
     plaintext_block = decryptor.finalize()
 
-    
+
 
 if __name__ == "__main__":
     key = b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10' \
           b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10'
     
+
+    directorio_actual = os.getcwd()
+    ruta_relativa = os.path.join(directorio_actual, 'archivoPrueba.txt')
+    
     # Rutas de los archivos de entrada y salida
-    input_file = 'archivo.bin'  # Cambia 'archivo.bin' al nombre de tu archivo de entrada
-    output_file = 'archivo_cifrado.bin'  # Nombre del archivo cifrado de salida
+    input_file = ruta_relativa  # Cambia 'archivo.bin' al nombre de tu archivo de entrada
+    output_file = ruta_relativa+'.cif'  # Nombre del archivo cifrado de salida
     
     # Cifra el archivo
     encrypt_file(input_file, output_file, key)
     print(f'El archivo "{input_file}" ha sido cifrado y guardado en "{output_file}" usando AES.')
+
+
+    #Descifra el archivo
+    #decrypt_file(input_file, output_file, key)
+    #print(f'El archivo "{input_file}" ha sido cifrado y guardado en "{output_file}" usando AES.')
+
+
+    
