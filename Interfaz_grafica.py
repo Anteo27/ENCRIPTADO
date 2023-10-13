@@ -3,8 +3,9 @@ from tkinter import filedialog, ttk, simpledialog, messagebox
 from ttkthemes import ThemedTk
 import encriptar
 import os
+ruta=""
 def cifrar():
-    ruta = entrada.get()
+    global ruta
     if not ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo antes de cifrar.")
         return
@@ -28,7 +29,7 @@ def cifrar():
     entrada.state(['readonly'])
 
 def descifrar():
-    ruta = entrada.get()
+    global ruta
     if not ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo antes de descifrar.")
         return
@@ -54,6 +55,7 @@ nombre_Archivo=""
 def seleccionar_archivo():
     global nombre_Archivo
     # Abre un cuadro de diálogo para seleccionar un archivo
+    global ruta
     ruta = filedialog.askopenfilename()
     nombre_Archivo= os.path.basename(ruta)
     # Actualiza el widget de entrada con la ruta del archivo seleccionado
