@@ -1,0 +1,1 @@
+entrada = ttk.Entry(marco, text=nombre_Archivo)

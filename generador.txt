@@ -1,0 +1,5 @@
+import secrets
+# Genera una clave de 256 bits
+clave = secrets.token_hex(16)
+
+print(clave)

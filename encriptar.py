@@ -1,7 +1,6 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from tkinter import filedialog
-
 import tkinter as tk
 import os as os
 import sys
@@ -51,23 +50,18 @@ def encrypt_file(input_file, key):
     
     # Finaliza el cifrado (puede haber datos adicionales en el buffer del cifrador)
     ciphertext_block = encryptor.finalize()
-    outfile.write(ciphertext_block)
     os.remove(input_file)
-
-
+    
 
 
 
 
 def decrypt_file(input_file, key):
-
     if ".cif" not in input_file:
-       print("No se puede desencriptar un archivo no cifrado")
-       return
-    
-    output_file = input_file.str.replace(".cif", "")
-    
-
+        print("No se puede desencriptar un archivo no cifrado")
+        return
+     
+    output_file=os.path.splitext(input_file)[0]
     # Tamaño del bloque AES en bytes (128 bits)
     block_size = 16
     
@@ -98,30 +92,29 @@ def decrypt_file(input_file, key):
     temporal = output_file
     os.remove(output_file)
     os.rename("final", temporal)
-
     os.remove(input_file)
 
 
 
-if __name__ == "__main__":
-    key = b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10' \
-          b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10'
+#if __name__ == "__main__":
+   # key = b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10' \
+         # b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10'
     
 
-    directorio_actual = os.getcwd()
-    ruta_relativa = os.path.join(directorio_actual, 'archivoPrueba.txt')
+   # directorio_actual = os.getcwd()
+   # ruta_relativa = os.path.join(directorio_actual, 'archivoPrueba.txt')
     
     # Rutas de los archivos de entrada y salida
     #input_file = ruta_relativa+'.cif'  # Cambia 'archivo.bin' al nombre de tu archivo de entrada
     
 
-    input_file = abrir_explorador_archivos()
+    #input_file = abrir_explorador_archivos()
 
    
 
     
     # Cifra el archivo
-    encrypt_file(input_file, key)
+    #encrypt_file(input_file, key)
     
 
     #Descifra el archivo
