@@ -4,22 +4,6 @@ from cryptography.hazmat.backends import default_backend
 from tkinter import filedialog
 import tkinter as tk
 import os as os
-import sys
-
-
-def limpiar_padding(lectura, escritura):
-    with open(lectura, 'r') as infile, open(escritura, 'w') as outfile:
-        data = infile.read()
-        data = data.replace('\x00', '')
-        outfile.write(data)
-
-
-def abrir_explorador_archivos():
-    root = tk.Tk()
-    root.withdraw()  # Ocultar la ventana de Tkinter
-    ruta_archivo = filedialog.askopenfilename()  # Abrir el explorador de archivos
-    return ruta_archivo
-
 
 def encrypt_file(input_file, key):
     if ".cif" in input_file:
@@ -90,21 +74,3 @@ def decrypt_file(input_file, key):
         outfile.write(plaintext_block)
 
     os.remove(input_file)
-
-# if __name__ == "__main__":
-   # key = b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10' \
-        # b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10'
-
-   # directorio_actual = os.getcwd()
-   # ruta_relativa = os.path.join(directorio_actual, 'archivoPrueba.txt')
-
-    # Rutas de los archivos de entrada y salida
-    # input_file = ruta_relativa+'.cif'  # Cambia 'archivo.bin' al nombre de tu archivo de entrada
-
-    # input_file = abrir_explorador_archivos()
-
-    # Cifra el archivo
-    # encrypt_file(input_file, key)
-
-    # Descifra el archivo
-    # decrypt_file(input_file, key)
