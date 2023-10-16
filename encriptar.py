@@ -1,8 +1,6 @@
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-from tkinter import filedialog
-import tkinter as tk
 import os as os
 
 def encrypt_file(input_file, key):
