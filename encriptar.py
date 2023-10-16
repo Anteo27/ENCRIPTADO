@@ -89,6 +89,8 @@ def decrypt_file(input_file, key):
         plaintext_block = unpadder.update(plaintext_block) + unpadder.finalize()
         outfile.write(plaintext_block)
 
+    os.remove(input_file)
+
 # if __name__ == "__main__":
    # key = b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10' \
         # b'\x01\x23\x45\x67\x89\xab\xcd\xef\xfe\xdc\xba\x98\x76\x54\x32\x10'
