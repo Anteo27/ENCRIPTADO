@@ -4,14 +4,13 @@ from cryptography.hazmat.backends import default_backend
 import os as os
 
 def encrypt_file(input_file, key):
-    if ".cif" in input_file:
-       print("No se puede volver a encriptar un archivo cifrado")
-       return
+    if input_file.endswith(".cif"):
+       return 1
 
     output_file = input_file+".cif"
     
     # Tamaño del bloque AES en bytes (128 bits)
-    block_size = 16
+    block_size = 16 
     
     # Crea un objeto AES Cipher con la clave proporcionada y modo de operación CBC
     cipher = Cipher(algorithms.AES(key), modes.CBC(b'\0' * block_size), backend=default_backend())
@@ -34,9 +33,8 @@ def encrypt_file(input_file, key):
     
     os.remove(input_file)
 def decrypt_file(input_file, key):
-    if ".cif" not in input_file:
-       print("El archivo no está cifrado")
-       return
+    if not input_file.endswith(".cif"):
+       return 1
 
     output_file = input_file.replace(".cif", "")
     

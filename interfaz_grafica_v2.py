@@ -23,7 +23,9 @@ def cifrar():
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
-    lib.encrypt_file(ruta, clave)
+    if lib.encrypt_file(ruta, clave) == 1:
+        messagebox.showwarning("Advertencia", "El archivo ya esta cifrado ")
+
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -43,11 +45,14 @@ def descifrar():
     if "Clave_256.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
+    
     clave = b''
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
-    lib.decrypt_file(ruta, clave)
+    if lib.decrypt_file(ruta, clave) == 1:
+        messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
+    
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
