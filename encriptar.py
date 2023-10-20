@@ -4,14 +4,13 @@ from cryptography.hazmat.backends import default_backend
 import os as os
 
 def encrypt_file(input_file, key):
-    if ".cif" in input_file:
-       print("No se puede volver a encriptar un archivo cifrado")
-       return
+    if input_file.endswith(".cif"):
+       return 1
 
     output_file = input_file+".cif"
     
     # Tamaño del bloque AES en bytes (128 bits)
-    block_size = 16
+    block_size = 16 
     
     # Crea un objeto AES Cipher con la clave proporcionada y modo de operación CBC
     cipher = Cipher(algorithms.AES(key), modes.CBC(b'\0' * block_size), backend=default_backend())
@@ -22,21 +21,25 @@ def encrypt_file(input_file, key):
 
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
-        # Lee todo el archivo
-        file_data = infile.read()
-        
-        # Añade padding a los datos usando PKCS7
-        padded_data = padder.update(file_data) + padder.finalize()
-        
-        # Cifra los datos y escribe el resultado en el archivo de salida
-        ciphertext_data = encryptor.update(padded_data) + encryptor.finalize()
-        outfile.write(ciphertext_data)
-    
+        while True:
+            block = infile.read(block_size)
+            if len(block) == 0:
+                break
+            # Añade padding al bloque si es necesario
+            if len(block) != block_size:
+                block = padder.update(block) + padder.finalize()
+            else:
+                block = padder.update(block)
+            # Cifra el bloque y escribe el resultado en el archivo de salida
+            outfile.write(encryptor.update(block))
+        # Finaliza el cifrado y escribe cualquier dato restante en el archivo de salida
+        outfile.write(encryptor.finalize())
     os.remove(input_file)
+
+
 def decrypt_file(input_file, key):
-    if ".cif" not in input_file:
-       print("El archivo no está cifrado")
-       return
+    if not input_file.endswith(".cif"):
+       return 1
 
     output_file = input_file.replace(".cif", "")
     

@@ -23,7 +23,9 @@ def cifrar():
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
-    lib.encrypt_file(ruta, clave)
+    if lib.encrypt_file(ruta, clave) == 1:
+        messagebox.showwarning("Advertencia", "El archivo ya esta cifrado ")
+
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -43,11 +45,14 @@ def descifrar():
     if "Clave_256.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
+    
     clave = b''
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
-    lib.decrypt_file(ruta, clave)
+    if lib.decrypt_file(ruta, clave) == 1:
+        messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
+    
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -91,10 +96,10 @@ etiqueta = tk.Label(marco, text="", bg="lightblue", fg="black")
 etiqueta.grid(row=2, column=0, padx=5, pady=5, sticky=(tk.W, tk.E))
 
 # Crear los botones de cifrar y descifrar
-boton_cifrar = tk.Button(marco, text="Cifrar y elegir clave", command=confirmar_cifrado, bg="green", fg="white")
+boton_cifrar = tk.Button(marco, text="Cifrar y elegir clave", command=confirmar_cifrado, bg="red", fg="white")
 boton_cifrar.grid(row=3, column=0, padx=5, pady=5, sticky=(tk.W, tk.E))
 
-boton_descifrar = tk.Button(marco, text="Descifrar y elegir clave", command=descifrar, bg="red", fg="white")
+boton_descifrar = tk.Button(marco, text="Descifrar y elegir clave", command=descifrar, bg="green", fg="white")
 boton_descifrar.grid(row=4, column=0, padx=5, pady=5, sticky=(tk.W, tk.E))
 
 # Configurar el marco para expandirse con la ventana
