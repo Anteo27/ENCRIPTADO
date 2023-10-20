@@ -35,6 +35,8 @@ def encrypt_file(input_file, key):
         # Finaliza el cifrado y escribe cualquier dato restante en el archivo de salida
         outfile.write(encryptor.finalize())
     os.remove(input_file)
+
+
 def decrypt_file(input_file, key):
     if not input_file.endswith(".cif"):
        return 1
