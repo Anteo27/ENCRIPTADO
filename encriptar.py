@@ -25,14 +25,14 @@ def encrypt_file(input_file, key):
             block = infile.read(block_size)
             if len(block) == 0:
                 break
-        # Añade padding al bloque si es necesario
+            # Añade padding al bloque si es necesario
             if len(block) != block_size:
                 block = padder.update(block) + padder.finalize()
             else:
                 block = padder.update(block)
             # Cifra el bloque y escribe el resultado en el archivo de salida
             outfile.write(encryptor.update(block))
-    # Finaliza el cifrado y escribe cualquier dato restante en el archivo de salida
+        # Finaliza el cifrado y escribe cualquier dato restante en el archivo de salida
         outfile.write(encryptor.finalize())
     os.remove(input_file)
 def decrypt_file(input_file, key):
