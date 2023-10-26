@@ -2,16 +2,10 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import encriptar as lib
 
+
 ruta = ""
 nombre_Archivo = ""
 
-def verificar_contraseña():
-    contraseña = entrada_contraseña.get()
-    if contraseña == "migue":  # Reemplaza "tu_contraseña" con la contraseña que desees.
-        marco.grid()
-        marco_contraseña.grid_remove()
-    else:
-        messagebox.showwarning("Advertencia", "Contraseña incorrecta. Inténtalo de nuevo.")
 
 
 def cifrar():
@@ -81,6 +75,14 @@ def confirmar_cifrado():
     entrada.delete(0, tk.END)
     nombre_Archivo = ""
 
+def verificar_contraseña():
+    Condicion = lib.verificar_contraseña(entrada_contraseña.get())
+    if Condicion == False:  # Reemplaza "tu_contraseña" con la contraseña que desees.
+        #Aqui va el metodo desencripta
+        messagebox.showwarning("Advertencia", "Contraseña incorrecta. Inténtalo de nuevo.")
+    else:
+        marco.grid()
+        marco_contraseña.grid_remove()
 
 # Crear ventana principal
 ventana = tk.Tk()

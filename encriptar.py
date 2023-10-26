@@ -4,6 +4,7 @@ from tkinter import filedialog
 import tkinter as tk
 import os as os
 import sys
+import hashlib
 
 def limpiar_padding(lectura, escritura):
     with open(lectura, 'r') as infile, open(escritura, 'w') as outfile:
@@ -16,7 +17,6 @@ def abrir_explorador_archivos():
     root.withdraw()  # Ocultar la ventana de Tkinter
     ruta_archivo = filedialog.askopenfilename()  # Abrir el explorador de archivos
     return ruta_archivo
-
 
 def encrypt_file(input_file, key):
     if ".cif" in input_file:
@@ -52,10 +52,6 @@ def encrypt_file(input_file, key):
     ciphertext_block = encryptor.finalize()
     os.remove(input_file)
     
-
-
-
-
 def decrypt_file(input_file, key):
     if ".cif" not in input_file:
         print("No se puede desencriptar un archivo no cifrado")
@@ -94,6 +90,25 @@ def decrypt_file(input_file, key):
     os.rename("final", temporal)
     os.remove(input_file)
 
+def hash_texto(texto_plano):
+    # Crear un objeto hash usando SHA256
+    hash_obj = hashlib.sha256()
+
+    # Codificar el texto plano a bytes y actualizar el objeto hash
+    hash_obj.update(texto_plano.encode('utf-8'))
+
+    # Obtener el hash en formato hexadecimal
+    hash_hex = hash_obj.hexdigest()
+
+    return hash_hex
+
+def verificar_contraseña(contraseña):
+    contraseñaHash = hash_texto(contraseña)
+    if hash_texto(contraseñaHash) == "1b8ba62af6c2eabb53e46cdd40b9b231aa4ff1e453795cb5b0ce097a0ccda54c":  # Reemplaza "tu_contraseña" con la contraseña que desees.
+        return True
+        
+    else:
+        return False
 
 
 #if __name__ == "__main__":
