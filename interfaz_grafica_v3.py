@@ -5,7 +5,7 @@ import encriptar as lib
 
 ruta = ""
 nombre_Archivo = ""
-
+clave2 = ""
 
 
 def cifrar():
@@ -27,7 +27,14 @@ def cifrar():
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
+    contraseña = entrada_contraseña.get()
+    clave2 = b''
+    clave2 = lib.hash_texto(contraseña)
+    clave2 = lib.obtener_primeros_256_bits(clave2)
+    clave2 = bytes.fromhex(clave2)
+    clave = lib.decrypt_file(clave,clave2, 0)
     lib.encrypt_file(ruta, clave)
+    
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -52,7 +59,17 @@ def descifrar():
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
-    lib.decrypt_file(ruta, clave)
+        
+    contraseña = entrada_contraseña.get()
+    clave2 = b''
+    clave2 = lib.hash_texto(contraseña)
+    clave2 = lib.obtener_primeros_256_bits(clave2)
+    clave2 = bytes.fromhex(clave2)
+    clave = lib.decrypt_file(clave, clave2, 0)
+    lib.decrypt_file(ruta, clave, 1)
+    
+
+    
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -74,6 +91,7 @@ def confirmar_cifrado():
     entrada.config(state='readonly')
     entrada.delete(0, tk.END)
     nombre_Archivo = ""
+
 
 def verificar_contraseña():
     Condicion = lib.verificar_contraseña(entrada_contraseña.get())

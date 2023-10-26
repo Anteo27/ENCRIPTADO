@@ -4,6 +4,8 @@ import encriptar as lib
 
 ruta = ""
 
+
+
 def cifrar():
     global ruta
     if not ruta:
@@ -47,7 +49,7 @@ def descifrar():
     with open(filekey, 'rb') as infile:
         lectura = infile.read()
         clave += lectura
-    lib.decrypt_file(ruta, clave)
+    lib.decrypt_file(ruta, clave, 1)
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
