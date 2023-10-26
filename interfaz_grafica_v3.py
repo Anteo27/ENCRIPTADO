@@ -13,6 +13,7 @@ def verificar_contraseña():
     else:
         messagebox.showwarning("Advertencia", "Contraseña incorrecta. Inténtalo de nuevo.")
 
+
 def cifrar():
     global ruta
     if not ruta:
