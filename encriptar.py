@@ -3,10 +3,54 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from Crypto.Cipher import AES
 import os as os
+import secrets
+import hashlib
 
-def encrypt_file(input_file, key):
+diccionario = {}
+
+def generar_clave_fichero():
+    # Genera una clave de 256 bits
+    clave = secrets.token_hex(16)
+
+    # Convierte la clave en una secuencia de bytes utilizando UTF-8
+    clave_bytes = clave.encode('utf-8')
+
+    # Genera el hash de la clave generada
+    sha3_256_hash = hashlib.sha3_256()
+    sha3_256_hash.update(clave_bytes)
+    
+    sha3_256_result = sha3_256_hash.hexdigest()
+
+    # Escribe la clave con su hash en el archivo
+    with open('claves.txt', 'a') as claves:
+        claves.write('\n'+sha3_256_result+','+clave)
+
+    cargar_claves()   
+    return sha3_256_result.encode('utf-8')
+
+
+def obtener_clave(hash):
+    clave=diccionario[hash.decode()]
+    return clave.encode('utf-8')
+
+def cargar_claves():
+    global diccionario
+    with open('claves.txt', 'r') as claves:
+     for line in claves:
+        # Divide cada línea en llave y valor utilizando el signo igual (=) como separador
+        hash, clave = line.strip().split(',')
+        # Almacena la llave y el valor en el diccionario
+        diccionario[hash] = clave.encode('utf-8')
+  
+
+def encrypt_file(input_file):
     if input_file.endswith(".cif"):
        return 1
+    
+    
+    hash = generar_clave_fichero()
+    key = b''
+    key = diccionario[hash.decode()]
 
     output_file = input_file+".cif"
     
@@ -24,6 +68,7 @@ def encrypt_file(input_file, key):
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
         outfile.write(IV)
+        outfile.write(hash)
         while True:
             block = infile.read(block_size)
             if len(block) == 0:
@@ -40,10 +85,11 @@ def encrypt_file(input_file, key):
     os.remove(input_file)
 
 
-def decrypt_file(input_file, key):
+def decrypt_file(input_file):
     if not input_file.endswith(".cif"):
        return 1
 
+    global diccionario
     output_file = input_file.replace(".cif", "")
     hash=""
     # Tamaño del bloque AES en bytes (128 bits)
@@ -53,7 +99,11 @@ def decrypt_file(input_file, key):
         IV = f.read(block_size)
         hash=f.read(block_size)
         hash+=f.read(block_size)
+        hash+=f.read(block_size)
+        hash+=f.read(block_size)
     print(IV)
+    hash = hash.decode()
+    key = diccionario[hash]
    
     # Crea un objeto AES Cipher con la clave proporcionada y modo de operación CBC
     cipher = Cipher(algorithms.AES(key), modes.CBC(IV), backend=default_backend())
@@ -65,6 +115,8 @@ def decrypt_file(input_file, key):
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
         # Lee y descifra el archivo en bloques
+        infile.read(block_size)
+        infile.read(block_size)
         infile.read(block_size)
         infile.read(block_size)
         infile.read(block_size)
@@ -89,3 +141,17 @@ def decrypt_file(input_file, key):
         outfile.write(plaintext_block)
 
     os.remove(input_file)
+
+
+
+#generar_clave_fichero()
+#clave = obtener_clave("hash3")
+#print(clave)
+#print(diccionario)
+
+ruta_actual = os.getcwd()
+ruta_completa = os.path.join(ruta_actual, 'prueba.docx.cif')
+#encrypt_file(ruta_completa)
+
+cargar_claves()
+decrypt_file(ruta_completa)

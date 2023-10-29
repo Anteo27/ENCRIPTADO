@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import encriptar as lib
 
+
 ruta = ""
+
 
 def cifrar():
     global ruta
