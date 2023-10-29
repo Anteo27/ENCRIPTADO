@@ -45,14 +45,16 @@ def decrypt_file(input_file, key):
        return 1
 
     output_file = input_file.replace(".cif", "")
-    
+    hash=""
     # Tamaño del bloque AES en bytes (128 bits)
     block_size = 16
     IV=""
     with open(input_file, 'rb') as f:
         IV = f.read(block_size)
-
+        hash=f.read(block_size)
+        hash+=f.read(block_size)
     print(IV)
+   
     # Crea un objeto AES Cipher con la clave proporcionada y modo de operación CBC
     cipher = Cipher(algorithms.AES(key), modes.CBC(IV), backend=default_backend())
     decryptor = cipher.decryptor()
@@ -63,6 +65,8 @@ def decrypt_file(input_file, key):
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
         # Lee y descifra el archivo en bloques
+        infile.read(block_size)
+        infile.read(block_size)
         infile.read(block_size)
         while True:
             # Lee un bloque del archivo de entrada
