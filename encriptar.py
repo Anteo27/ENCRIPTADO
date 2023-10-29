@@ -1,6 +1,7 @@
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from Crypto.Cipher import AES
 import os as os
 
 def encrypt_file(input_file, key):
@@ -11,9 +12,10 @@ def encrypt_file(input_file, key):
     
     # Tamaño del bloque AES en bytes (128 bits)
     block_size = 16 
-    
+    IV=os.urandom(block_size)
+    print(IV)
     # Crea un objeto AES Cipher con la clave proporcionada y modo de operación CBC
-    cipher = Cipher(algorithms.AES(key), modes.CBC(b'\0' * block_size), backend=default_backend())
+    cipher = Cipher(algorithms.AES(key), modes.CBC(IV), backend=default_backend())
     encryptor = cipher.encryptor()
 
     # Crea un objeto Padder para hacer el padding PKCS7
@@ -21,6 +23,7 @@ def encrypt_file(input_file, key):
 
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
+        outfile.write(IV)
         while True:
             block = infile.read(block_size)
             if len(block) == 0:
@@ -45,9 +48,13 @@ def decrypt_file(input_file, key):
     
     # Tamaño del bloque AES en bytes (128 bits)
     block_size = 16
-    
+    IV=""
+    with open(input_file, 'rb') as f:
+        IV = f.read(block_size)
+
+    print(IV)
     # Crea un objeto AES Cipher con la clave proporcionada y modo de operación CBC
-    cipher = Cipher(algorithms.AES(key), modes.CBC(b'\0' * block_size), backend=default_backend())
+    cipher = Cipher(algorithms.AES(key), modes.CBC(IV), backend=default_backend())
     decryptor = cipher.decryptor()
 
     # Crea un objeto Unpadder para eliminar el padding PKCS7
@@ -56,8 +63,10 @@ def decrypt_file(input_file, key):
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
         # Lee y descifra el archivo en bloques
+        infile.read(block_size)
         while True:
             # Lee un bloque del archivo de entrada
+                
             file_block = infile.read(block_size)
             if not file_block:
                 break  # Fin del archivo
@@ -67,6 +76,7 @@ def decrypt_file(input_file, key):
             
             # Elimina el padding usando PKCS7 y escribe el resultado en el archivo de salida
             plaintext_block = unpadder.update(plaintext_block)
+           
             outfile.write(plaintext_block)
         
         # Finaliza el descifrado y elimina cualquier padding restante
