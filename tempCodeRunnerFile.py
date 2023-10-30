@@ -1,1 +1,2 @@
-entrada = ttk.Entry(marco, text=nombre_Archivo)
+# Ocultar el marco hasta que se verifique la contraseña
+marco.grid_remove()
