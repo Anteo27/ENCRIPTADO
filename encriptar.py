@@ -128,7 +128,6 @@ def decrypt_file(input_file):
         infile.read(block_size)
         while True:
             # Lee un bloque del archivo de entrada
-                
             file_block = infile.read(block_size)
             if not file_block:
                 break  # Fin del archivo
@@ -143,7 +142,7 @@ def decrypt_file(input_file):
         
         # Finaliza el descifrado y elimina cualquier padding restante
         plaintext_block = decryptor.finalize()
-        plaintext_block = unpadder.update(plaintext_block) + unpadder.finalize()
+        plaintext_block =  unpadder.finalize()
         outfile.write(plaintext_block)
 
     os.remove(input_file)
