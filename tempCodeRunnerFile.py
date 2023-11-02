@@ -1,2 +1,3 @@
-# Ocultar el marco hasta que se verifique la contraseña
-marco.grid_remove()
+leer_claves_cifradas()
+print (diccionario_descifrado)
+generar_clave_fichero

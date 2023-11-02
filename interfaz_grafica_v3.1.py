@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import encriptar as lib
-
+import os
 
 ruta = ""
 filekey=""
@@ -39,11 +39,7 @@ def descifrar():
     if "claves.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
-    #cargamos la ruta a la libreria encriptar
-    lib.cargarRutaDisccionario(filekey)
-    #cargamos las claves del disccionario
-    lib.cargar_claves()    
-    #if lib.decrypt_file(ruta, clave) == 1:
+
     if lib.decrypt_file(ruta) == 1:
         messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
     
@@ -75,15 +71,15 @@ def verificar_contraseña():
         messagebox.showwarning("Advertencia", "Contraseña incorrecta. Inténtalo de nuevo.")
     else:
         global filekey
-        filekey = filedialog.askopenfilename()
-        while "claves.txt" not in filekey:
-            messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
-            filekey = filedialog.askopenfilename()
+        ruta_actual = os.getcwd()
+        filekey = os.path.join(ruta_actual, 'claves.txt.cif')
         marco.grid()
         marco_contraseña.grid_remove()
-        lib.cargarRutaDisccionario(filekey)
+        lib.cargarRutaDiccionario(filekey)
+        lib.leer_claves_cifradas()
         lib.generar_clave_fichero()
-        lib.cargar_claves()
+        lib.encriptar_rsa()
+        lib.leer_claves_cifradas()
 # Crear ventana principal
 ventana = tk.Tk()
 ventana.title('Cifrador y Descifrador')
