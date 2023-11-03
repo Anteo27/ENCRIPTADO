@@ -1,2 +1,2 @@
 
-    # Crear un marco para la contraseña
+    if "claves.txt" in ruta:
