@@ -20,10 +20,14 @@ def cifrar():
     if "claves.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
+    if "parkeys.txt" in ruta:
+        messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
+        return
     #if lib.encrypt_file(ruta, clave) == 1:
     if lib.encrypt_file(ruta) == 1:
         messagebox.showwarning("Advertencia", "El archivo ya esta cifrado ")
-
+     # Mostrar el mensaje de "Proceso completado"
+    messagebox.showinfo("Información", "Proceso completado")
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -36,13 +40,17 @@ def descifrar():
     if "claves.txt" in ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
         return
+    if "parkeys.txt" in ruta:
+        messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
+        return
     if "claves.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
 
     if lib.decrypt_file(ruta) == 1:
         messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
-    
+     # Mostrar el mensaje de "Proceso completado"
+    messagebox.showinfo("Información", "Proceso completado")
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -76,20 +84,20 @@ def verificar_contraseña():
         marco.grid()
         marco_contraseña.grid_remove()
         lib.cargarRutaDiccionario(filekey)
-        lib.leer_claves_cifradas()
+        lib.leer_diccionario_cifrado()
         lib.generar_clave_fichero()
         lib.encriptar_rsa()
-        lib.leer_claves_cifradas()
+        lib.leer_diccionario_cifrado()
 # Crear ventana principal
 ventana = tk.Tk()
 ventana.title('Cifrador y Descifrador')
-ventana.configure(background="red")
+ventana.configure(background="lightblue")
 
 # Crear un marco para los widgets
 marco = tk.Frame(ventana, padx=10, pady=10, bg="lightblue")
 marco.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-# Crear un marco para la contraseña
+    # Crear un marco para la contraseña
 marco_contraseña = tk.Frame(ventana, padx=10, pady=10, bg="lightblue")
 marco_contraseña.grid(row=0, column=0)
 

@@ -1,3 +1,2 @@
-leer_claves_cifradas()
-print (diccionario_descifrado)
-generar_clave_fichero
+
+    # Crear un marco para la contraseña
