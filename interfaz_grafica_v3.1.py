@@ -1,60 +1,56 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import encriptar as lib
-
+import os
 
 ruta = ""
-
+filekey=""
 
 def cifrar():
-    global ruta
+    global ruta,filekey
     if not ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo antes de cifrar.")
         return
-    filekey = filedialog.askopenfilename()
     if not filekey or not ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo con la clave antes de cifrar.")
         return
-    if "Clave_256.txt" in ruta:
+    if "claves.txt" in ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
         return
-    if "Clave_256.txt" not in filekey:
+    if "claves.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
-    clave = b''
-    with open(filekey, 'rb') as infile:
-        lectura = infile.read()
-        clave += lectura
-    if lib.encrypt_file(ruta, clave) == 1:
+    if "parkeys.txt" in ruta:
+        messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
+        return
+    #if lib.encrypt_file(ruta, clave) == 1:
+    if lib.encrypt_file(ruta) == 1:
         messagebox.showwarning("Advertencia", "El archivo ya esta cifrado ")
-
+     # Mostrar el mensaje de "Proceso completado"
+    messagebox.showinfo("Información", "Proceso completado")
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
 
 def descifrar():
-    global ruta
+    global ruta,filekey
     if not ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo antes de descifrar.")
         return
-    filekey = filedialog.askopenfilename()
-    if not filekey:
-        messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo con la clave antes de descifrar.")
-        return
-    if "Clave_256.txt" in ruta:
+    if "claves.txt" in ruta:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
         return
-    if "Clave_256.txt" not in filekey:
+    if "parkeys.txt" in ruta:
+        messagebox.showwarning("Advertencia", "Por favor, selecciona un archivo que no sea la propia clave.")
+        return
+    if "claves.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
-    
-    clave = b''
-    with open(filekey, 'rb') as infile:
-        lectura = infile.read()
-        clave += lectura
-    if lib.decrypt_file(ruta, clave) == 1:
+
+    if lib.decrypt_file(ruta) == 1:
         messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
-    
+     # Mostrar el mensaje de "Proceso completado"
+    messagebox.showinfo("Información", "Proceso completado")
     entrada.config(state='normal')
     entrada.delete(0, tk.END)
     entrada.config(state='readonly')
@@ -77,25 +73,55 @@ def confirmar_cifrado():
     entrada.delete(0, tk.END)
     nombre_Archivo = ""
 
+def verificar_contraseña():
+    Condicion = lib.verificar_contraseña(entrada_contraseña.get())
+    if Condicion == False: 
+        messagebox.showwarning("Advertencia", "Contraseña incorrecta. Inténtalo de nuevo.")
+    else:
+        global filekey
+        ruta_actual = os.getcwd()
+        filekey = os.path.join(ruta_actual, 'claves.txt.cif')
+        marco.grid()
+        marco_contraseña.grid_remove()
+        lib.cargarRutaDiccionario(filekey)
+        lib.leer_diccionario_cifrado()
+        lib.generar_clave_fichero()
+        lib.encriptar_rsa()
+        lib.leer_diccionario_cifrado()
 # Crear ventana principal
 ventana = tk.Tk()
 ventana.title('Cifrador y Descifrador')
-ventana.configure(background="red")
+ventana.configure(background="lightblue")
 
 # Crear un marco para los widgets
 marco = tk.Frame(ventana, padx=10, pady=10, bg="lightblue")
 marco.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
+    # Crear un marco para la contraseña
+marco_contraseña = tk.Frame(ventana, padx=10, pady=10, bg="lightblue")
+marco_contraseña.grid(row=0, column=0)
+
 # Crear un botón para seleccionar un archivo
 boton_seleccionar_archivo = tk.Button(marco, text="Seleccionar archivo", command=seleccionar_archivo, bg="white", fg="black")
 boton_seleccionar_archivo.grid(row=0, column=0, padx=5, pady=5, sticky=(tk.W, tk.E))
+
+# Crear un widget de entrada de texto para la contraseña
+entrada_contraseña = tk.Entry(marco_contraseña, show="*", bg="white")
+entrada_contraseña.grid(row=1, column=1)
 
 # Crear un widget de entrada de texto
 entrada = tk.Entry(marco, state='readonly', bg="white")
 entrada.grid(row=1, column=0, padx=5, pady=5, sticky=(tk.W, tk.E))
 
+# Ocultar el marco hasta que se verifique la contraseña
+marco.grid_remove()
+
 etiqueta = tk.Label(marco, text="", bg="lightblue", fg="black")
 etiqueta.grid(row=2, column=0, padx=5, pady=5, sticky=(tk.W, tk.E))
+# Crear un botón para verificar la contraseña
+boton_verificar = tk.Button(marco_contraseña, text="Verificar contraseña", command=verificar_contraseña, bg="green", fg="white")
+boton_verificar.grid(row=2, column=1)
+
 
 # Crear los botones de cifrar y descifrar
 boton_cifrar = tk.Button(marco, text="Cifrar y elegir clave", command=confirmar_cifrado, bg="red", fg="white")

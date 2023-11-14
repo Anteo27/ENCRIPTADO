@@ -1,1 +1,2 @@
-entrada = ttk.Entry(marco, text=nombre_Archivo)
+
+    if "claves.txt" in ruta:
