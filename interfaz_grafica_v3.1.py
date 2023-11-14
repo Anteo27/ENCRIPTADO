@@ -46,14 +46,19 @@ def descifrar():
     if "claves.txt" not in filekey:
         messagebox.showwarning("Advertencia", "Por favor, selecciona un fichero válido de clave.")
         return
-
-    if lib.decrypt_file(ruta) == 1:
-        messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
-     # Mostrar el mensaje de "Proceso completado"
-    messagebox.showinfo("Información", "Proceso completado")
-    entrada.config(state='normal')
-    entrada.delete(0, tk.END)
-    entrada.config(state='readonly')
+    try:
+        finalizacion=lib.decrypt_file(ruta)
+        if finalizacion == 1:
+            messagebox.showwarning("Advertencia", "El archivo ya esta descifrado ")
+        if finalizacion==2:
+             messagebox.showwarning("Advertencia", "El archivo encriptado ha sido modificado abralo bajo su reponsabilidad ")
+        # Mostrar el mensaje de "Proceso completado"
+        messagebox.showinfo("Información", "Proceso completado")
+        entrada.config(state='normal')
+        entrada.delete(0, tk.END)
+        entrada.config(state='readonly')
+    except ValueError as e:
+        messagebox.showwarning("Advertencia", "No se puede desencriptar por modificacion a nivel de byte")
 
 
 nombre_Archivo = ""
