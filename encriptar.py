@@ -300,7 +300,6 @@ def decrypt_file_keys(input_file, key):
 
         # Añade el último bloque de texto plano a la variable plaintext
         plaintext += plaintext_block
-    os.remove(input_file)
     return plaintext
 
 def hash_texto(texto_plano):
