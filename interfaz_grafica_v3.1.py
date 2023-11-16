@@ -58,7 +58,7 @@ def descifrar():
         entrada.delete(0, tk.END)
         entrada.config(state='readonly')
     except (ValueError, KeyError) as e:
-        messagebox.showwarning("Advertencia", "No se puede desencriptar por modificacion a nivel de byte")
+             messagebox.showwarning("Advertencia", "No se puede desencriptar por modificacion a nivel de byte o si lo hace no funcionara de forma correcta")
 
 
 nombre_Archivo = ""

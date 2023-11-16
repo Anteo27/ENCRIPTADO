@@ -14,26 +14,75 @@ mode=0
 private_key_pem =""""""
 public_key_pem =""""""
 ruta_diccionario=""
+def firmar_documento(documento, clave_privada):#documento ruta
+    leerdocumento=b''
+    with open(documento, 'rb') as infile:
+        leerdocumento=infile.read()
+    if isinstance(leerdocumento, str):
+        leerdocumento = leerdocumento.encode('utf-8')
 
+    clave_privada_desde_str = serialization.load_pem_private_key(
+        clave_privada.encode('utf-8'),
+        password=None,
+        backend=default_backend()
+    )
 
-def comprobar_hash(hash_original, hash_desencriptado):
-    if(hash_original == hash_desencriptado):
+    firma = clave_privada_desde_str.sign(
+        leerdocumento,
+        padrsa.PSS(
+            mgf=padrsa.MGF1(hashes.SHA256()),
+            salt_length=padrsa.PSS.MAX_LENGTH
+        ),
+        hashes.SHA256()
+    )
+
+    return firma
+
+def verificar_documento(documento, firma, clave_publica):
+    # Asegúrate de que el documento es un objeto de bytes
+    leerdocumento=b''
+    with open(documento, 'rb') as infile:
+        leerdocumento=infile.read()
+    if isinstance(leerdocumento, str):
+        leerdocumento = leerdocumento.encode('utf-8')
+
+    clave_publica_desde_str = serialization.load_pem_public_key(
+        clave_publica.encode('utf-8'),
+        backend=default_backend()
+    )
+    try:
+        clave_publica_desde_str.verify(
+            firma,
+            leerdocumento,
+            padrsa.PSS(
+                mgf=padrsa.MGF1(hashes.SHA256()),
+                salt_length=padrsa.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
         return True
-    return False
+    except:
+        return False
+
+
+# def comprobar_hash(hash_original, hash_desencriptado):
+#     if(hash_original == hash_desencriptado):
+#         return True
+#     return False
 
 
 
-def hash_archivo(ruta_archivo):
-    with open(ruta_archivo, 'rb') as infile:
-       contenido = infile.read()
-    sha3_256_hash = hashlib.sha3_256()
-    sha3_256_hash.update(contenido)
-    sha3_256_result = sha3_256_hash.hexdigest()
+# def hash_archivo(ruta_archivo):
+#     with open(ruta_archivo, 'rb') as infile:
+#        contenido = infile.read()
+#     sha3_256_hash = hashlib.sha3_256()
+#     sha3_256_hash.update(contenido)
+#     sha3_256_result = sha3_256_hash.hexdigest()
 
-    result = b''
-    result = sha3_256_result
+#     result = b''
+#     result = sha3_256_result
 
-    return result.encode()
+#     return result.encode()
 
 def encriptar_rsa():
     global ruta_diccionario, diccionario_descifrado,public_key_pem
@@ -144,7 +193,8 @@ def obtener_clave(hash):
 
 def encrypt_file(input_file):
     global runtime_hash,mode
-    hash_original=hash_archivo(input_file)
+    firma_original=firmar_documento(input_file,private_key_pem)
+    #hash_original=hash_archivo(input_file)
     if input_file.endswith(".cif"):
        return 1
     key=b''
@@ -165,7 +215,7 @@ def encrypt_file(input_file):
     # Abre el archivo de entrada y salida en modo binario
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
         outfile.write(IV)
-        outfile.write(hash_original)
+        outfile.write(firma_original)
         outfile.write(runtime_hash)
         while True:
             block = infile.read(block_size)
@@ -186,7 +236,7 @@ def encrypt_file(input_file):
 def decrypt_file(input_file):
     if not input_file.endswith(".cif"):
        return 1
-    hash_original_desencriptado=""
+    firma_original_desencriptado=""
     global diccionario
     output_file = input_file.replace(".cif", "")
     hash=""
@@ -195,10 +245,7 @@ def decrypt_file(input_file):
     IV=""
     with open(input_file, 'rb') as f:
         IV = f.read(block_size)
-        hash_original_desencriptado=f.read(block_size)
-        hash_original_desencriptado+=f.read(block_size)
-        hash_original_desencriptado+=f.read(block_size)
-        hash_original_desencriptado+=f.read(block_size)
+        firma_original_desencriptado=f.read(block_size*16)
         hash=f.read(block_size)
         hash+=f.read(block_size)
         hash+=f.read(block_size)
@@ -220,14 +267,8 @@ def decrypt_file(input_file):
     with open(input_file, 'rb') as infile, open(output_file, 'wb') as outfile:
         # Lee y descifra el archivo en bloques
         infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
-        infile.read(block_size)
+        infile.read(block_size*16)
+        infile.read(block_size*4)
         while True:
             # Lee un bloque del archivo de entrada
             file_block = infile.read(block_size)
@@ -246,17 +287,13 @@ def decrypt_file(input_file):
         plaintext_block = decryptor.finalize()
         plaintext_block =  unpadder.finalize()
         outfile.write(plaintext_block)
-    hash_recalculado=hash_archivo(output_file)
-    flag=comprobar_hash(hash_original_desencriptado,hash_recalculado)
-    
-       
+    flag=verificar_documento(output_file,firma_original_desencriptado,public_key_pem)
     os.remove(input_file)
     if(flag==True):
         print("no se ha modificado")
     else:
         print("Se ha modificado en el proceso")
-        print(hash_original_desencriptado.decode())
-        print(hash_recalculado.decode())
+        print(firma_original_desencriptado.decode())
         return 2
     
 
