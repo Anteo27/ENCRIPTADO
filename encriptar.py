@@ -5,7 +5,9 @@ from cryptography.hazmat.backends import default_backend
 import os as os
 import secrets
 import hashlib
-
+from hamming import Hamming
+from mceliece import McEliece, genKey
+import numpy as np
 diccionario_descifrado=""
 diccionario = {}
 runtime_hash=b''
@@ -14,6 +16,18 @@ mode=0
 private_key_pem =""""""
 public_key_pem =""""""
 ruta_diccionario=""
+
+# ------------------------------------------------------------------------------------------------------------
+def read_file(file):
+    data = file.read()
+    return data
+def read_key_from_file(filename):
+    with open(filename, 'r') as f:
+        key = np.loadtxt(f, dtype=int)
+    return key
+
+
+# ------------------------------------------------------------------------------------------------------------
 def firmar_documento(documento, clave_privada):#documento ruta
     leerdocumento=b''
     with open(documento, 'rb') as infile:
@@ -84,75 +98,46 @@ def verificar_documento(documento, firma, clave_publica):
 
 #     return result.encode()
 
-def encriptar_rsa():
+def encriptar_MCLIECE():
     global ruta_diccionario, diccionario_descifrado,public_key_pem
-    os.remove(ruta_diccionario)
-    # Cargar la clave publica
-    public_key = serialization.load_pem_public_key(
-        public_key_pem.encode(),
-        None,
-    )
+    # os.remove(ruta_diccionario)
+      # Seleccionar el código de corrección de errores
+    h = Hamming(15)  # h = Goppa()
+    # Leer las claves desde los archivos
+    S = read_key_from_file("private_key_S.txt")
+    G = read_key_from_file("private_key_G.txt")
+    P = read_key_from_file("private_key_P.txt")
+    pubKey = read_key_from_file("public_key.txt")
     # Asegúrate de que tus datos son bytes
-    if isinstance(diccionario_descifrado, str):
-        diccionario_descifrado = diccionario_descifrado.encode()
+    # if isinstance(diccionario_descifrado, str):
+    #     diccionario_descifrado = diccionario_descifrado.encode()
 
-    # Divide los datos en bloques de 190 bytes
-    bloques = [diccionario_descifrado[i:i+190] for i in range(0, len(diccionario_descifrado), 190)]
-
-    ciphertext = b""
-    for bloque in bloques:
-        # Cifra cada bloque individualmente
-        bloque_cifrado = public_key.encrypt(
-            bloque,
-            padrsa.OAEP(
-                mgf=padrsa.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-        # Añade el bloque cifrado al texto cifrado total
-        ciphertext += bloque_cifrado
-    # Write the concatenated encrypted data to the file
-    with open(ruta_diccionario, 'wb') as file:
-        file.write(ciphertext)
-
+    pvKey = (S, G, P)
+    mceliece = McEliece(h, pvKey, pubKey)
+    with open(ruta_diccionario, 'w') as f:
+        f.write(mceliece.encrypt_str(diccionario_descifrado.encode('utf8')))
         
 def leer_diccionario_cifrado():
     global ruta_diccionario,diccionario_descifrado,private_key_pem
-
-    # Cargar la clave privada
-    private_key = serialization.load_pem_private_key(
-        private_key_pem.encode("utf8"),
-        password=None,
-    )
-
+    h = Hamming(15)  # h = Goppa()
+    # Leer las claves desde los archivos
+    S = read_key_from_file("private_key_S.txt")
+    G = read_key_from_file("private_key_G.txt")
+    P = read_key_from_file("private_key_P.txt")
+    pubKey = read_key_from_file("public_key.txt")
     # Asegúrate de que tus datos son bytes
     if isinstance(diccionario_descifrado, str):
         diccionario_descifrado = diccionario_descifrado.encode()
     # Leer el texto cifrado del archivo
-    with open(ruta_diccionario, 'rb') as file:
-        ciphertext = file.read()
-
-    # Divide el texto cifrado en bloques del tamaño de la clave
-    tamaño_bloque = (private_key.key_size + 7) // 8
-    bloques = [ciphertext[i:i+tamaño_bloque] for i in range(0, len(ciphertext), tamaño_bloque)]
-
-    plaintext = b""
-    for bloque in bloques:
-        # Desencripta cada bloque individualmente
-        bloque_descifrado = private_key.decrypt(
-            bloque,
-            padrsa.OAEP(
-                mgf=padrsa.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-        # Añade el bloque descifrado al texto descifrado total
-        plaintext += bloque_descifrado
-
+    pvKey = (S, G, P)
+    mceliece = McEliece(h, pvKey, pubKey)
+    plaintext =""
+    with open(ruta_diccionario, 'r') as f:
+        data = read_file(f)
+        plaintext += mceliece.decrypt_str(data)
+    print(plaintext)
     # Convierte los bytes a string y guarda en diccionario_descifrado
-    diccionario_descifrado = plaintext.decode()
+    diccionario_descifrado = plaintext
     separador=diccionario_descifrado.split('+')
     for parhashclave in separador:
         if parhashclave:
@@ -183,6 +168,7 @@ def generar_clave_fichero():
     # Escribe la clave con su hash en el archivo
     
     diccionario_descifrado += (sha3_256_result + "," + clave + "+")
+
     #return sha3_256_result.encode('utf-8')
     runtime_hash=sha3_256_result.encode()
 
@@ -383,3 +369,4 @@ def verificar_contraseña(contraseña):
         
     else:
         return False
+    

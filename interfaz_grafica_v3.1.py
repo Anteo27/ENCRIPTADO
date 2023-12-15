@@ -91,7 +91,7 @@ def verificar_contraseña():
         lib.cargarRutaDiccionario(filekey)
         lib.leer_diccionario_cifrado()
         lib.generar_clave_fichero()
-        lib.encriptar_rsa()
+        lib.encriptar_MCLIECE()
         lib.leer_diccionario_cifrado()
 # Crear ventana principal
 ventana = tk.Tk()

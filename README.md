@@ -1,2 +1,3 @@
-# ENCRIPTADO
-Repositorio para el código de las prácticas de la Asignatura de TEORÍA DE CÓDIGOS Y CRIPTOGRAFÍA
+# McEliece
+基于汉明纠错码的McEliece算法python实现
+Goppa太难了没搞明白
